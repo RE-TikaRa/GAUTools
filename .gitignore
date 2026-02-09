@@ -1,0 +1,51 @@
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.whl
+
+# Test/coverage caches
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.hypothesis/
+.tox/
+.nox/
+
+# Type checkers / linters
+.mypy_cache/
+.pytype/
+.pyre/
+.ruff_cache/
+
+# Logs and runtime
+*.log
+*.pid
+*.seed
+*.sqlite3
+*.db
+
+# Environment and local config
+.env
+.env.*
+config.ini
+
+# Tooling / IDE
+.idea/
+.vscode/
+.codemap/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
