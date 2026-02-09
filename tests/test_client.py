@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from gautools.client import GSAUClient
+from src.client import GSAUClient
 
 
 def test_resolve_credentials_prefers_env_then_config(monkeypatch, tmp_path):

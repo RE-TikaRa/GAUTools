@@ -1,5 +1,9 @@
-from cli import _build_parser, _handle_proof_download
-from gautools.proofs import download_proof, get_proof_history, get_proof_templates
+from src.cli import _build_parser, _handle_proof_download  # type: ignore[reportMissingImports]
+from src.proofs import (  # type: ignore[reportMissingImports]
+    download_proof,
+    get_proof_history,
+    get_proof_templates,
+)
 
 
 class FakeResponse:

@@ -4,5 +4,8 @@
   "scripts": {
     "build": "python -m compileall gautools",
     "test": "uv run pytest -q"
+  },
+  "dependencies": {
+    "pyright": "^1.1.408"
   }
 }

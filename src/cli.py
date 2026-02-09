@@ -1,11 +1,11 @@
 import argparse
 from typing import Any, Callable
 
-from gautools.client import GSAUClient
-from gautools.grades import get_grade_detail, get_grades
-from gautools.proofs import download_proof, get_proof_history, get_proof_templates
-from gautools.schedule import get_schedule, get_terms
-from gautools.utils import print_table, to_csv, to_json
+from src.client import GSAUClient
+from src.grades import get_grade_detail, get_grades
+from src.proofs import download_proof, get_proof_history, get_proof_templates
+from src.schedule import get_schedule, get_terms
+from src.utils import print_table, to_csv, to_json
 
 
 def _format_output(data: Any, output_format: str) -> str:

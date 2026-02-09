@@ -1,5 +1,5 @@
-from gautools.models import Course, Term
-from gautools.schedule import get_schedule, get_terms
+from src.models import Course, Term
+from src.schedule import get_schedule, get_terms
 
 
 class FakeResponse:

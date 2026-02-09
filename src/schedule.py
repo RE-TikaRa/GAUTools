@@ -6,7 +6,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from gautools.models import Course, Term  # type: ignore[reportMissingImports]
+from src.models import Course, Term  # type: ignore[reportMissingImports]
 
 BASE_URL = "https://jwgl.gsau.edu.cn"
 

@@ -1,4 +1,4 @@
-from gautools.models import Course, Grade, GradeDetail, Term
+from src.models import Course, Grade, GradeDetail, Term
 
 
 def test_course_defaults():

@@ -7,7 +7,7 @@ from urllib.parse import unquote, urlparse
 
 from bs4 import BeautifulSoup
 
-from gautools.models import ProofRecord, ProofTemplate  # type: ignore[reportMissingImports]
+from src.models import ProofRecord, ProofTemplate  # type: ignore[reportMissingImports]
 
 BASE_URL = "https://jwgl.gsau.edu.cn"
 

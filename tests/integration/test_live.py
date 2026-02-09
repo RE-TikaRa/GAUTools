@@ -2,8 +2,8 @@ import os
 
 import pytest
 
-from gautools.client import GSAUClient
-from gautools.schedule import get_terms
+from src.client import GSAUClient
+from src.schedule import get_terms
 
 
 def _has_env_credentials() -> bool:

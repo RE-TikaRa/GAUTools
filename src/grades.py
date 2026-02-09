@@ -7,7 +7,7 @@ from urllib.parse import parse_qsl
 
 from bs4 import BeautifulSoup
 
-from gautools.models import Grade, GradeDetail  # type: ignore[reportMissingImports]
+from src.models import Grade, GradeDetail  # type: ignore[reportMissingImports]
 
 BASE_URL = "https://jwgl.gsau.edu.cn"
 

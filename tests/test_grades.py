@@ -1,4 +1,4 @@
-from gautools import grades
+from src import grades
 
 
 class FakeResponse:
