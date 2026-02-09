@@ -1,0 +1,21 @@
+[project]
+name = "gautools"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "lxml",
+    "python-dotenv",
+    "pycryptodome",
+]
+
+[project.scripts]
+gau = "cli:main"
+
+[dependency-groups]
+dev = ["pytest"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

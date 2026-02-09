@@ -114,6 +114,12 @@ def _handle_proof_history(args: argparse.Namespace) -> str:
     return _format_output(data, args.format)
 
 
+def _handle_logout(args: argparse.Namespace) -> str:
+    client = GSAUClient(prompt=False)
+    client.clear_session()
+    return "Session cleared."
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="gau", description="GSAU command line")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -174,6 +180,9 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     history_parser.add_argument("--output", help="Write output to file")
     history_parser.set_defaults(handler=_handle_proof_history)
+
+    logout_parser = subparsers.add_parser("logout", help="Clear saved session")
+    logout_parser.set_defaults(handler=_handle_logout)
 
     return parser
 

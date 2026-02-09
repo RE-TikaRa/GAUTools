@@ -14,8 +14,10 @@
 在项目根目录执行：
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
+
+`requirements.txt` 仍保留作为参考（可选的 pip 工作流）。
 
 当前依赖：
 - requests
@@ -52,10 +54,10 @@ password = 你的密码
 
 ## 命令行使用方法
 
-入口文件：`cli.py`
+入口文件：`gau`
 
 ```bash
-python cli.py <command> [options]
+uv run gau <command> [options]
 ```
 
 支持命令：
@@ -69,16 +71,16 @@ python cli.py <command> [options]
 ### 1) 列出可用学期
 
 ```bash
-python cli.py terms --format table
-python cli.py terms --format json
+uv run gau terms --format table
+uv run gau terms --format json
 ```
 
 ### 2) 获取课表
 
 ```bash
-python cli.py schedule --year 2024-2025 --term 1 --format table
-python cli.py schedule --year 2024-2025 --term 1 --format json
-python cli.py schedule --year 2024-2025 --term 1 --format csv --output schedule.csv
+uv run gau schedule --year 2024-2025 --term 1 --format table
+uv run gau schedule --year 2024-2025 --term 1 --format json
+uv run gau schedule --year 2024-2025 --term 1 --format csv --output schedule.csv
 ```
 
 参数说明：
@@ -90,9 +92,9 @@ python cli.py schedule --year 2024-2025 --term 1 --format csv --output schedule.
 ### 3) 获取成绩列表
 
 ```bash
-python cli.py grades --year 2024-2025 --term 1 --format table
-python cli.py grades --year 2024-2025 --term 1 --format json
-python cli.py grades --year 2024-2025 --term 1 --format csv --output grades.csv
+uv run gau grades --year 2024-2025 --term 1 --format table
+uv run gau grades --year 2024-2025 --term 1 --format json
+uv run gau grades --year 2024-2025 --term 1 --format csv --output grades.csv
 ```
 
 说明：
@@ -101,7 +103,7 @@ python cli.py grades --year 2024-2025 --term 1 --format csv --output grades.csv
 ### 4) 获取成绩详情
 
 ```bash
-python cli.py grade-detail ^
+uv run gau grade-detail ^
   --jxb-id "/jsxsd/kscj/pscj_list.do?xs0101id=你的学号&jx0404id=教学班ID&zcj=总评" ^
   --course-name "课程名" ^
   --student-id "你的学号" ^
@@ -116,7 +118,7 @@ python cli.py grade-detail ^
 也支持自动匹配模式（不传 `--jxb-id`）：
 
 ```bash
-python cli.py grade-detail --course-name "线性代数" --year 2024-2025 --term 1 --format json
+uv run gau grade-detail --course-name "线性代数" --year 2024-2025 --term 1 --format json
 ```
 
 程序会先查询该学期成绩，再按课程名自动匹配详情链接。
@@ -124,15 +126,15 @@ python cli.py grade-detail --course-name "线性代数" --year 2024-2025 --term 
 ### 5) 查询可用证明模板
 
 ```bash
-python cli.py proofs --format table
-python cli.py proofs --format json
+uv run gau proofs --format table
+uv run gau proofs --format json
 ```
 
 ### 6) 查询已生成证明记录
 
 ```bash
-python cli.py proof-history --format table
-python cli.py proof-history --format json
+uv run gau proof-history --format table
+uv run gau proof-history --format json
 ```
 
 ## Python API 使用方法
@@ -210,5 +212,5 @@ if grades:
 ## 测试
 
 ```bash
-python -m pytest -q
+uv run pytest -q
 ```

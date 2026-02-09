@@ -1,9 +1,12 @@
 import base64
 import configparser
 import getpass
+import json
 import os
 import random
 import re
+import stat
+from datetime import datetime
 from pathlib import Path
 
 import requests
@@ -62,6 +65,7 @@ class GSAUClient:
         "service=https%3A%2F%2Fweb.gsau.edu.cn%2Fwengine-auth%2Flogin%3Fcas_login%3Dtrue"
     )
     AUTH_TEST_URL = "https://jwgl.gsau.edu.cn/jsxsd/framework/xsMain.jsp"
+    DEFAULT_SESSION_FILE = Path.home() / ".gsau_session"
 
     def __init__(self, username=None, password=None, prompt=True, timeout=30):
         self._prompt = prompt
@@ -72,6 +76,94 @@ class GSAUClient:
         self.session = requests.Session()
         self.session.trust_env = False
         self.session.headers.update({"User-Agent": random_user_agent()})
+        self._try_restore_session()
+
+    def _session_file_path(self):
+        env_path = os.getenv("GSAU_SESSION_FILE", "")
+        if env_path:
+            return Path(env_path)
+
+        config = configparser.ConfigParser()
+        repo_root = Path(__file__).resolve().parents[1]
+        cwd = Path.cwd()
+        candidates = [
+            cwd / "config.ini",
+            repo_root / "config.ini",
+        ]
+        for candidate in candidates:
+            if candidate.exists():
+                config.read(candidate, encoding="utf-8")
+                if config.has_section("session"):
+                    config_path = config.get("session", "file", fallback="").strip()
+                    if config_path:
+                        return Path(config_path).expanduser()
+                break
+
+        return self.DEFAULT_SESSION_FILE
+
+    def _save_session(self):
+        session_file = self._session_file_path()
+        cookies_dict = {}
+        for cookie in self.session.cookies:
+            cookies_dict[cookie.name] = cookie.value
+
+        data = {
+            "cookies": cookies_dict,
+            "saved_at": datetime.now().isoformat(),
+            "username": self._username[:4] + "***" if self._username else "",
+        }
+
+        session_file.parent.mkdir(parents=True, exist_ok=True)
+        session_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+        if os.name != "nt":
+            session_file.chmod(stat.S_IRUSR | stat.S_IWUSR)
+
+    def _load_session(self):
+        session_file = self._session_file_path()
+        if not session_file.exists():
+            return False
+
+        try:
+            data = json.loads(session_file.read_text(encoding="utf-8"))
+            cookies = data.get("cookies", {})
+            if not cookies:
+                return False
+
+            for name, value in cookies.items():
+                self.session.cookies.set(name, value)
+            return True
+        except (json.JSONDecodeError, KeyError, OSError):
+            return False
+
+    def clear_session(self):
+        session_file = self._session_file_path()
+        if session_file.exists():
+            session_file.unlink()
+        self._logged_in = False
+
+    def _validate_session(self):
+        try:
+            response = self.session.get(
+                self.AUTH_TEST_URL, allow_redirects=False, timeout=self._timeout
+            )
+            if response.status_code == 302:
+                location = response.headers.get("Location", "")
+                return "authserver" not in location
+            if response.status_code == 200:
+                return "pwdLoginDiv" not in response.text
+            return False
+        except requests.RequestException:
+            return False
+
+    def _try_restore_session(self):
+        if not self._load_session():
+            return False
+        if self._validate_session():
+            self._logged_in = True
+            return True
+        self.session.cookies.clear()
+        return False
 
     def _prompt_credentials(self):
         username = ""
@@ -194,6 +286,7 @@ class GSAUClient:
         self._logged_in = True
         self._username = username
         self._password = password
+        self._save_session()
         return True
 
     def ensure_login(self):

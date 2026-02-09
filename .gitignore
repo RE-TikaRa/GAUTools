@@ -1,18 +1,40 @@
+# Python bytecode and caches
 __pycache__/
 *.py[cod]
+*$py.class
+
+# Native extensions
+*.so
+*.pyd
+*.dll
+
+# Packaging/build artifacts
+.Python
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+pip-wheel-metadata/
+*.egg-info/
+*.egg
+*.whl
 
 # Virtual environments
 .venv/
 venv/
 env/
+ENV/
+.python-version
 
-# Build artifacts
-build/
-dist/
-*.egg-info/
-*.whl
-
-# Test/coverage caches
+# Test, coverage, and analysis caches
 .pytest_cache/
 .coverage
 .coverage.*
@@ -21,31 +43,72 @@ htmlcov/
 .hypothesis/
 .tox/
 .nox/
-
-# Type checkers / linters
 .mypy_cache/
 .pytype/
 .pyre/
 .ruff_cache/
+.dmypy.json
+dmypy.json
+pytestdebug.log
+*.cover
+*.py,cover
 
 # Logs and runtime
 *.log
+*.out
+*.err
 *.pid
+*.pid.lock
 *.seed
 *.sqlite3
 *.db
 
-# Environment and local config
+# Local environment and secrets
 .env
 .env.*
+*.env.local
 config.ini
+config.local.ini
+config.*.local.ini
+.envrc
+.direnv/
+.gsau_session
+*.session
+session.json
+cookies.txt
+*.token
+token.json
+tokens.json
+credentials.json
+credentials/
+secret/
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.kdbx
+id_rsa
+id_ed25519
+!.env.example
+!.env.sample
+!.env.template
+!config.example.ini
+
+# Notebook checkpoints
+.ipynb_checkpoints/
 
 # Tooling / IDE
 .idea/
 .vscode/
+*.code-workspace
 .codemap/
+.sisyphus/
 
 # OS files
 .DS_Store
+.DS_Store?
 Thumbs.db
 Desktop.ini
+$RECYCLE.BIN/
