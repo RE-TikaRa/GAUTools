@@ -1,10 +1,17 @@
-from gautools.proofs import get_proof_history, get_proof_templates
+from cli import _build_parser, _handle_proof_download
+from gautools.proofs import download_proof, get_proof_history, get_proof_templates
 
 
 class FakeResponse:
     def __init__(self, text=""):
         self.text = text
         self.encoding = None
+
+
+class FakeBinaryResponse:
+    def __init__(self, headers=None, content=b""):
+        self.headers = headers or {}
+        self.content = content
 
 
 class FakeClient:
@@ -80,3 +87,39 @@ def test_get_proof_history_parses_preview_and_download_urls():
         records[0].download_url
         == "/kxzm/kxzmDownload?generationid=AAA&manageid=05&sqlx_mc=在读证明"
     )
+
+
+def test_download_proof_uses_content_disposition_filename_with_output_dir(tmp_path):
+    output_dir = tmp_path / "downloads"
+    output_dir.mkdir()
+    headers = {"Content-Disposition": "attachment; filename*=UTF-8''proof%20file.pdf"}
+    response = FakeBinaryResponse(headers=headers, content=b"proof-data")
+    download_url = "/kxzm/kxzmDownload?generationid=AAA"
+    client = FakeClient({"https://jwgl.gsau.edu.cn" + download_url: response})
+
+    saved_path = download_proof(client, download_url, str(output_dir))
+
+    expected_path = output_dir / "proof file.pdf"
+    assert saved_path == str(expected_path)
+    assert expected_path.read_bytes() == b"proof-data"
+
+
+def test_download_proof_falls_back_to_output_path_when_no_header(tmp_path):
+    output_file = tmp_path / "explicit.pdf"
+    response = FakeBinaryResponse(headers={}, content=b"proof-data")
+    download_url = "/kxzm/proofs/downloads/proof-file.pdf"
+    client = FakeClient({"https://jwgl.gsau.edu.cn" + download_url: response})
+
+    saved_path = download_proof(client, download_url, str(output_file))
+
+    assert saved_path == str(output_file)
+    assert output_file.read_bytes() == b"proof-data"
+
+
+def test_proof_download_parser_sets_handler_and_args():
+    parser = _build_parser()
+    args = parser.parse_args(["proof-download", "--id", "123", "--output", "out.pdf"])
+
+    assert args.handler is _handle_proof_download
+    assert args.id == "123"
+    assert args.output == "out.pdf"

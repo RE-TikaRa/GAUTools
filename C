@@ -1,0 +1,8 @@
+{
+  "lsp": {
+    "pyright-local": {
+      "command": ["C:\\Users\\Tika\\AppData\\Roaming\\npm\\pyright-langserver.cmd", "--stdio"],
+      "extensions": ["py", "pyi"]
+    }
+  }
+}

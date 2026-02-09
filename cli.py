@@ -3,7 +3,7 @@ from typing import Any, Callable
 
 from gautools.client import GSAUClient
 from gautools.grades import get_grade_detail, get_grades
-from gautools.proofs import get_proof_history, get_proof_templates
+from gautools.proofs import download_proof, get_proof_history, get_proof_templates
 from gautools.schedule import get_schedule, get_terms
 from gautools.utils import print_table, to_csv, to_json
 
@@ -114,6 +114,41 @@ def _handle_proof_history(args: argparse.Namespace) -> str:
     return _format_output(data, args.format)
 
 
+def _handle_proof_download(args: argparse.Namespace) -> str:
+    if not args.id and not args.name:
+        raise ValueError("--id or --name is required")
+
+    client = GSAUClient()
+    records = get_proof_history(client)
+
+    matched = None
+    if args.id:
+        target_id = str(args.id).strip()
+        for record in records:
+            if str(getattr(record, "generation_id", "")).strip() == target_id:
+                matched = record
+                break
+        if not matched:
+            raise ValueError("No proof record found for the provided --id")
+    else:
+        target_name = str(args.name).strip().lower()
+        matches = []
+        for record in records:
+            current_name = str(getattr(record, "name", "")).strip().lower()
+            if current_name == target_name or target_name in current_name:
+                matches.append(record)
+        if not matches:
+            raise ValueError("No proof record found for the provided --name")
+        if len(matches) > 1:
+            raise ValueError("Multiple proof records match --name; use --id instead")
+        matched = matches[0]
+
+    output_path = args.output
+    saved_path = download_proof(client, matched.download_url, output_path)
+    args.output = None
+    return saved_path
+
+
 def _handle_logout(args: argparse.Namespace) -> str:
     client = GSAUClient(prompt=False)
     client.clear_session()
@@ -180,6 +215,14 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     history_parser.add_argument("--output", help="Write output to file")
     history_parser.set_defaults(handler=_handle_proof_history)
+
+    download_parser = subparsers.add_parser(
+        "proof-download", help="Download proof file from history"
+    )
+    download_parser.add_argument("--id", help="Proof generation id")
+    download_parser.add_argument("--name", help="Proof name from history")
+    download_parser.add_argument("--output", help="Write downloaded proof to file")
+    download_parser.set_defaults(handler=_handle_proof_download)
 
     logout_parser = subparsers.add_parser("logout", help="Clear saved session")
     logout_parser.set_defaults(handler=_handle_logout)

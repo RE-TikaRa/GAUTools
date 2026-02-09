@@ -1,0 +1,8 @@
+{
+  "name": "gautools",
+  "private": true,
+  "scripts": {
+    "build": "python -m compileall gautools",
+    "test": "uv run pytest -q"
+  }
+}

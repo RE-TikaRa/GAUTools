@@ -1,7 +1,9 @@
 """Proof generation helpers."""
 
 from typing import Dict, List, Optional
+import os
 import re
+from urllib.parse import unquote, urlparse
 
 from bs4 import BeautifulSoup
 
@@ -40,6 +42,30 @@ def _extract_query_value(path: Optional[str], key: str) -> Optional[str]:
     match = re.search(rf"(?:\?|&){re.escape(key)}=([^&]+)", path)
     if match:
         return match.group(1)
+    return None
+
+
+def _extract_filename(content_disposition: str) -> Optional[str]:
+    if not content_disposition:
+        return None
+
+    filename_star = re.search(
+        r"filename\*\s*=\s*([^;]+)", content_disposition, re.IGNORECASE
+    )
+    if filename_star:
+        value = filename_star.group(1).strip().strip('"').strip("'")
+        if "''" in value:
+            value = value.split("''", 1)[1]
+        value = unquote(value)
+        return value or None
+
+    filename_match = re.search(
+        r"filename\s*=\s*([^;]+)", content_disposition, re.IGNORECASE
+    )
+    if filename_match:
+        value = filename_match.group(1).strip().strip('"').strip("'")
+        return value or None
+
     return None
 
 
@@ -132,3 +158,24 @@ def get_proof_history(client) -> List[ProofRecord]:
         )
 
     return records
+
+
+def download_proof(client, download_url, output_path=None):
+    response = client.get(_build_url(download_url))
+    filename = _extract_filename(response.headers.get("Content-Disposition", ""))
+    if not filename:
+        parsed = urlparse(download_url or "")
+        filename = os.path.basename(parsed.path) or "proof"
+
+    if output_path:
+        if os.path.isdir(output_path):
+            final_path = os.path.join(output_path, filename)
+        else:
+            final_path = output_path
+    else:
+        final_path = filename
+
+    with open(final_path, "wb") as file_handle:
+        file_handle.write(response.content)
+
+    return final_path
